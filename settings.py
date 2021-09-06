@@ -1,6 +1,6 @@
 import handler
 
-PORT = 80
+PORT = 8000
 HOST = "127.0.0.1"
 HANDLER = handler.MyHttpHandler
 REQUEST_QUEUE_SIZE = 32

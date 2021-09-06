@@ -82,7 +82,7 @@ def russianize_city_name(data):
         data["_autotranslit_ru_name"] += "ь"
 
     try:
-        data["_ru_name"] = list(
+        data["_ru_names"] = list(
                                     set(
                                         [match[1] for match in list(
                                             re.findall(
@@ -93,13 +93,16 @@ def russianize_city_name(data):
                                     )
                                 )
 
-        if len(data["_ru_name"]) == 1:  # немного нечестная подмена имени
-            data["_autotranslit_ru_name"] = data["_ru_name"][0]
+        if len(data["_ru_names"]) == 1:  # немного нечестная подмена имени
+            data["_autotranslit_ru_name"] = data["_ru_names"][0]
 
-        data["_ru_name"] = [name.lower() for name in data["_ru_name"]]
+        if not data["_ru_names"]:  # если вдруг не удалось обнаружить кириллическое имя
+            data["_ru_names"].append(data["_autotranslit_ru_name"])
+            
+        data["_ru_names"] = [name.lower() for name in data["_ru_names"]]
         # если сделать это при распаковке из re.findall, то _autotranslit_ru_name будет lowercase
     except IndexError:
-        data["_ru_name"] = [data["_autotranslit_ru_name"], ]
+        data["_ru_names"] = [data["_autotranslit_ru_name"], ]
 
     data["alternatenames"] = [name.strip() for name in data["alternatenames"].split(",")]
 
@@ -121,7 +124,7 @@ def is_suitable_timezone(tz):
 def represent_cities():
     settings.DATA.sort(
         key=lambda x: x["population"],  # по умолчанию города отсортированы по убыванию численности населения,
-        reverse=True  # засчет этого не будет нужна сортировка для п. 3 основного задания
+        reverse=True  # за счет этого не будет нужна сортировка для п. 3 основного задания
     )
 
 
@@ -152,7 +155,7 @@ def check_transliterate():
 
 
 def update_autotranslit():
-    from transliterate.base import TranslitLanguagePack, registry
+    from transliterate.base import registry
     from transliterate.contrib.languages.ru.translit_language_pack import RussianLanguagePack
     RussianLanguagePack.pre_processor_mapping.update(
         {

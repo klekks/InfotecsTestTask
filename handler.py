@@ -1,6 +1,6 @@
 from http.server import SimpleHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
-from typing import Any
+from typing import Any, Callable
 import json
 import settings
 
@@ -51,7 +51,7 @@ class MyHttpHandler(SimpleHTTPRequestHandler):
         second_city_name = get_query_param(params, "second_city")
 
         city1 = self.get_city_by_name(first_city_name)
-        city2 = self.get_city_by_name(second_city_name)
+        city2 = self.get_city_by_name(second_city_name, is_suit=lambda city: city != city1)
 
         if city1 and city2:
             self.SUCCESS({
@@ -71,12 +71,15 @@ class MyHttpHandler(SimpleHTTPRequestHandler):
             })
 
     @staticmethod
-    def get_city_by_name(city_name):
+    def get_city_by_name(city_name, is_suit: Callable = lambda *x: True):
         try:
-            return list(filter(
-                lambda city: city_name.lower() in city["_ru_name"],
-                settings.DATA
-            ))[0]  # достаем город с совпадающим именем (города уже отсортированы по населению)
+            filtered_cities = list(filter(
+                                lambda town: city_name.lower() in town["_ru_names"],
+                                settings.DATA
+                            ))  # достаем города с совпадающими именами (города уже отсортированы по населению)
+            for city in filtered_cities:
+                if is_suit(city):
+                    return city
         except IndexError:
             return None  # если подходящего города нет, то None
 
@@ -125,7 +128,7 @@ class MyHttpHandler(SimpleHTTPRequestHandler):
     @staticmethod
     def _add_extra_hints(part, hints, limit):
         extra_hints = list()
-        if len(hints) < limit:  # если вдруг недобрали городов, то подкинем еще какие-нибудь варинаты
+        if len(hints) < limit:  # если вдруг недобрали городов, то подкинем еще какие-нибудь варианты
             extra_hints = list(  # эта громоздкая штука говорит:
                 filter(  # найти те города
                     lambda city: any(
@@ -177,5 +180,3 @@ def get_query_param(query,
         return to_type(query.get(param, None)[0])
     except TypeError:
         return default
-
-
