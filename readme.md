@@ -1,5 +1,7 @@
 # GeoNames RestAPI
 
+### [GitHub Repos](https://github.com/klekks/InfotecsTestTask)
+
 Тестовое задание для стажера на позицию «Программист на языке Python» Infotecs
 
 На основе базы данных [GeoNames](http://download.geonames.org) создан сервис, который:
