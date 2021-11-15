@@ -81,6 +81,4 @@
 * `http://127.0.0.1/hint?part=Са`
 <hr/>
 
-<p align="center">
-    <img src="https://248006.selcdn.ru/main/upload/setka_images/13041326032020_e3ea06ecc4efe66fd609360c227a5daace25eda6.png.webp">
-</p>
+
